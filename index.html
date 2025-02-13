@@ -14,23 +14,7 @@
     <!--В примере используется библиотека js-cookie для работы с cookie. Вы можете использовать свое решение-->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.2/js.cookie.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <!-- Yandex.Metrika counter -->
-<script type="text/javascript" >
-   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-   m[i].l=1*new Date();
-   for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-   k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
 
-   ym(99900466, "init", {
-        clickmap:true,
-        trackLinks:true,
-        accurateTrackBounce:true,
-        webvisor:true
-   });
-</script>
-<noscript><div><img src="https://mc.yandex.ru/watch/99900466" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-<!-- /Yandex.Metrika counter -->
     <style>
         .card {
             width: 100%; 
@@ -66,6 +50,7 @@
             width: 100%;
             color: white;
             padding: 15px;
+            text-align: center; /* Центрируем текст */
         }
         .cookie-notification_hidden_yes {
             display: none;
@@ -76,6 +61,19 @@
         }
         .cookie-notification__body {
             margin-bottom: 10px;
+        }
+        .cookie-notification__buttons {
+            display: flex;
+            justify-content: center; /* Центрируем кнопки */
+        }
+        .cookie-notification__button {
+            margin: 0 10px; /* Добавляем отступ между кнопками */
+            padding: 8px 15px;
+            background-color: #4CAF50; /* Зеленый цвет кнопки */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -249,7 +247,7 @@
                     <div id="price-display">1000 - 10000 руб.</div>
                 </div>                
             </div>
-            <div class="col-md-9 d-flex flex-column">
+            <div class="col-md-9 d-flex flex-column" id="rooms-list">
             </div>
         </div>
     </div>
@@ -259,7 +257,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="bookingModalLabel">Бронирование номера</h1>
-                    <button type="button" class="btn-close"  aria-label="Close"></button> </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> </div>
                 <div class="modal-body">
                     <form id="bookingForm">
                         <div class="mb-3">
@@ -318,7 +316,7 @@
         { number: 12, guests: 4, title: "Апартаменты", description: "Просторные апартаменты с кухней и спальней.", price: 7000, images: ["https://i.ytimg.com/vi/CBFgUzsgMZI/maxresdefault.jpg", "https://staisha.top/uploads/posts/2023-02/1675310638_staisha-top-p-mebellar-spalni-spalnya-pinterest-65.jpg", "https://via.placeholder.com/350x150"], services: ["Wi-Fi", "Кухня", "Две спальни", "Завтрак в номер"], meal: ["Завтрак включен","Обед включен","Ужин включен"], rooms: 3 }
     ];   
 
-    const roomsContainer = document.getElementById('rooms-container');
+    const roomsContainer = document.getElementById('rooms-list'); // Исправлено ID
     const guestsSelect = document.getElementById('guests');
     const priceRange = document.getElementById('price-range');
     const priceDisplay = document.getElementById('price-display');
@@ -349,7 +347,7 @@
     }
 
     function renderRooms(data) {
-        roomsContainer.querySelector('.col-md-9').innerHTML = ''; 
+        roomsContainer.innerHTML = ''; 
         data.forEach(room => {
             let imageCarousel = "";
             if (room.images && room.images.length > 0) {
@@ -388,7 +386,7 @@
                     </div>
                 </div>
             `;
-            roomsContainer.querySelector('.col-md-9').insertAdjacentHTML('beforeend', card);
+            roomsContainer.insertAdjacentHTML('beforeend', card);
         });
         attachBookingListeners();
     }
@@ -473,94 +471,95 @@
         const value = parseInt(priceRange.value);
         priceDisplay.textContent = `${value} - ${maxPrice} руб.`;
 
-const filters = getFilters();
-let filteredRooms = filterRooms(roomsData, filters);
-const selectedGuests = parseInt(guestsSelect.value);
-filteredRooms = filteredRooms.filter(room => selectedGuests === 0 || room.guests >= selectedGuests);
-renderRooms(filteredRooms);
-});
+        const filters = getFilters();
+        let filteredRooms = filterRooms(roomsData, filters);
+        const selectedGuests = parseInt(guestsSelect.value);
+        filteredRooms = filteredRooms.filter(room => selectedGuests === 0 || room.guests >= selectedGuests);
+        renderRooms(filteredRooms);
+    });
 
-function displayFiltersInModal(filters) {
-let servicesString = "";
-let mealString = "";
-let roomsString = "";
+    function displayFiltersInModal(filters) {
+        let servicesString = "";
+        let mealString = "";
+        let roomsString = "";
 
-if (filters.services && filters.services.length > 0) {
-    servicesString = "Услуги: " + filters.services.join(', ');
-} else {
-    servicesString = "Услуги: Не выбрано";
-}
+        if (filters.services && filters.services.length > 0) {
+            servicesString = "Услуги: " + filters.services.join(', ');
+        } else {
+            servicesString = "Услуги: Не выбрано";
+        }
 
-if (filters.meal && filters.meal.length > 0) {
-    mealString = "Питание: " + filters.meal.join(', ');
-} else {
-    mealString = "Питание: Не выбрано"; 
-}
+        if (filters.meal && filters.meal.length > 0) {
+            mealString = "Питание: " + filters.meal.join(', ');
+        } else {
+            mealString = "Питание: Не выбрано"; 
+        }
 
-if (filters.rooms && filters.rooms.length > 0) {
-    roomsString = "Комнат: " + filters.rooms.join(', ') + " ";
-} else {
-    roomsString = "Комнат: Не выбрано ";
-}
+        if (filters.rooms && filters.rooms.length > 0) {
+            roomsString = "Комнат: " + filters.rooms.join(', ') + " ";
+        } else {
+            roomsString = "Комнат: Не выбрано ";
+        }
 
-const filterString = `В номер входят:\n${servicesString}\n${mealString}\n${roomsString}`;
-document.getElementById('bookingFilters').textContent = filterString;
-}
-
-
-renderRooms(roomsData);
+        const filterString = `В номер входят:\n${servicesString}\n${mealString}\n${roomsString}`;
+        document.getElementById('bookingFilters').textContent = filterString;
+    }
 
 
-const bookingForm = document.getElementById('bookingForm');
-const downloadButton = document.getElementById('downloadButton');
-bookingForm.addEventListener('submit', function(event) {
-event.preventDefault();
-const name = document.getElementById('name').value;
-const email = document.getElementById('email').value;
-const phone = document.getElementById('phone').value;
-const roomType = document.getElementById('roomType').value;
-const arrivalDate = document.getElementById('arrivalDate').value;
-const departureDate = document.getElementById('departureDate').value;
-const roomPrice = document.getElementById('roomPrice').value;
-const bookingFilters = document.getElementById('bookingFilters').textContent;
-const messageDiv = document.getElementById('bookingMessage');
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    renderRooms(roomsData);
+
+
+    const bookingForm = document.getElementById('bookingForm');
+    const downloadButton = document.getElementById('downloadButton');
+    bookingForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+        const roomType = document.getElementById('roomType').value;
+        const arrivalDate = document.getElementById('arrivalDate').value;
+        const departureDate = document.getElementById('departureDate').value;
+        const roomPrice = document.getElementById('roomPrice').value;
+        const bookingFilters = document.getElementById('bookingFilters').textContent;
+        const messageDiv = document.getElementById('bookingMessage');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             messageDiv.textContent = "Неверный формат email.";
             messageDiv.style.color = "red";
             messageDiv.style.display = 'block';
-            return;}
-            const phoneRegex = /^\+?\d{10,15}$/; 
+            return;
+        }
+        const phoneRegex = /^\+?\d{10,15}$/; 
         if (!phoneRegex.test(phone)) {
             messageDiv.textContent = "Неверный формат номера телефона.";
             messageDiv.style.color = "red";
             messageDiv.style.display = 'block';
             return; 
         }
-const bookingData = `Имя: ${name}\nEmail: ${email}\nТелефон: ${phone}\nТип номера: ${roomType}\nДата заезда: ${arrivalDate}\nДата выезда: ${departureDate}\nИтоговая сумма: ${roomPrice}\nФильтры: ${bookingFilters}`;
+        const bookingData = `Имя: ${name}\nEmail: ${email}\nТелефон: ${phone}\nТип номера: ${roomType}\nДата заезда: ${arrivalDate}\nДата выезда: ${departureDate}\nИтоговая сумма: ${roomPrice}\nФильтры: ${bookingFilters}`;
 
-const message = `Номер успешно забронирован!`;
-messageDiv.textContent = message;
-messageDiv.style.color = '#4E4748';
-messageDiv.style.display = 'block';
-downloadButton.style.display = 'block';
+        const message = `Номер успешно забронирован!`;
+        messageDiv.textContent = message;
+        messageDiv.style.color = '#4E4748';
+        messageDiv.style.display = 'block';
+        downloadButton.style.display = 'block';
 
 
-downloadButton.addEventListener('click', function() {
-    const blob = new Blob([bookingData], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'Бронирование EVRASIA.txt';
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    URL.revokeObjectURL(url);
-    document.body.removeChild(a);
-});
-});
-// Валидация дат
-arrivalInput.addEventListener('change', validateDates);
+        downloadButton.addEventListener('click', function() {
+            const blob = new Blob([bookingData], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Бронирование EVRASIA.txt';
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        });
+    });
+    // Валидация дат
+    arrivalInput.addEventListener('change', validateDates);
     departureInput.addEventListener('change', validateDates);
 
     function validateDates() {
@@ -587,6 +586,51 @@ arrivalInput.addEventListener('change', validateDates);
         renderRooms(filteredRooms);
     }
 
+    function addClass(o, c) {
+        var re = new RegExp("(^|\\s)" + c + "(\\s|$)", "g");
+        if (!o || re.test(o.className)) {
+            return;
+        }
+        o.className = (o.className + " " + c).replace(/\s+/g, " ").replace(/(^ | $)/g, "");
+    }
+
+    function removeClass(o, c) {
+        var re = new RegExp('(^|\\s)' + c + '(\\s|$)', 'g');
+        if (!o) {
+            return;
+        }
+        o.className = o.className.replace(re, '$1').replace(/\s+/g, ' ').replace(/(^ | $)/g, '');
+    }
+
+    function hideMessage() {
+        addClass(messageElement, 'cookie-notification_hidden_yes');
+    }
+
+    function showMessage() {
+        removeClass(messageElement, 'cookie-notification_hidden_yes');
+    }
+
+    function saveAnswer() {
+        hideMessage();
+        Cookies.set('agreement', '1');
+    }
+
+    function initCounter() {
+        ym(99900466, 'init', {});
+        saveAnswer();
+    }
+
+    var messageElement = document.querySelector('.cookie-notification');
+    if (!Cookies.get('agreement')) {
+        showMessage();
+        document.querySelector('#yes').addEventListener('click', initCounter);
+    } else {
+        initCounter();
+    }
+
+    // Yandex Metrika (перемещен сюда для корректной работы)
+    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)}) (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
 
 </script>
 
@@ -610,64 +654,12 @@ arrivalInput.addEventListener('change', validateDates);
         <div class="cookie-notification__header">Предупреждение о сборе статистики</div>
         <div class="cookie-notification__body">
        <p>Этот сайт собирает статистику посещения и данные посетителей.</p>
-      <p>[Ссылка на Пользовательское соглашение вашего сайта или на Политику конфиденциальности вашего сайта]</p>
+       <p><a href="#">Ссылка на Политику конфиденциальности</a></p>  <!--  Добавьте реальную ссылку -->
         </div>
         <div class="cookie-notification__buttons">
             <button class="cookie-notification__button" id="yes">Я согласен</button>
         </div>
     </div>
-    <script type="text/javascript">
-        var messageElement = document.querySelector('.cookie-notification');
-        // Если нет cookies, то показываем плашку
-        if (!Cookies.get('agreement')) {
-            showMessage();
-        } else {
-            initCounter();
-        }
-        // Загружаем сам код счетчика сразу
-        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-        m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-        (window, document,'script','//mc.yandex.ru/metrika/tag.js', 'ym')
-        // Функция добавляет класс к DOM-элементу. Вы можете использовать библиотеку jQuery или другой фреймворк
-        function addClass (o, c) {
-            var re = new RegExp("(^|\\s)" + c + "(\\s|$)", "g");
-            if (!o || re.test(o.className)) {
-                return;
-            }
-            o.className = (o.className + " " + c).replace(/\s+/g, " ").replace(/(^ | $)/g, "");
-        }
-        // Функция удаляет класс из DOM-элемента. Вы можете использовать библиотеку jQuery или другой фреймворк
-        function removeClass (o, c) {
-            var re = new RegExp('(^|\\s)' + c + '(\\s|$)', 'g');
-            if (!o) {
-                return;
-            }
-            o.className = o.className.replace(re, '$1').replace(/\s+/g, ' ').replace(/(^ | $)/g, '');
-        }
-        // Функция, которая прячет предупреждение
-        function hideMessage () {
-            addClass(messageElement, 'cookie-notification_hidden_yes');
-        }
-        // Функция, которая показывает предупреждение
-        function showMessage () {
-            removeClass(messageElement, 'cookie-notification_hidden_yes');
-        }
-        function saveAnswer () {
-            // Прячем предупреждение
-            hideMessage();
-
-            // Ставим cookies
-            Cookies.set('agreement', '1');
-        }
-        function initCounter () {
-            ym(99900466, 'init', {});
-            saveAnswer();
-        }
-        // Нажатие кнопки "Я согласен"
-        document.querySelector('#yes').addEventListener('click', function () {
-            initCounter();
-        });
-    </script>
 </div>
 </footer>
 </body>
