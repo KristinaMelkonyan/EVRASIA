@@ -12,21 +12,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Advent+Pro:ital,wght@0,100..900;1,100..900&family=Caveat:wght@400..700&family=Marck+Script&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <!-- Yandex.Metrika counter -->
-<script type="text/javascript" >
-   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-   m[i].l=1*new Date();
-   for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-   k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
-   ym(99900466, "init", {
-        clickmap:true,
-        trackLinks:true,
-        accurateTrackBounce:true,
-        webvisor:true
-   });
-</script>
-<noscript><div><img src="https://mc.yandex.ru/watch/99900466" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-<!-- /Yandex.Metrika counter -->
+    <script type="text/javascript" >
+       (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+       m[i].l=1*new Date();
+       for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+       k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+       (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+       ym(99900466, "init", {
+            clickmap:true,
+            trackLinks:true,
+            accurateTrackBounce:true,
+            webvisor:true
+       });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/99900466" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
     <style>
         .card {
             width: 100%; 
@@ -55,9 +55,30 @@
             width: 100%;
             object-fit: cover;
         }
+        #cookieConsent {
+            position: fixed; /* Фиксированное положение */
+            bottom: 0; /* Внизу страницы */
+            left: 0; /* Слева */
+            width: 100%; /* Занимает всю ширину */
+            z-index: 1000; /* Над другими элементами */
+        }
     </style>
 </head>
 <body>
+
+    <div id="cookieConsent" class="alert alert-info alert-dismissible fade show" style="display: none;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <p>Мы используем файлы cookie для улучшения вашего опыта на нашем сайте.  Продолжая использовать наш сайт, вы соглашаетесь с нашей <a href="privacy_policy.html">политикой конфиденциальности</a>.</p>
+                </div>
+                <div class="col-md-4">
+                    <button type="button" class="btn btn-primary" id="cookieAccept">ОК</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <header class="text-center">
         <nav class="navbar navbar-expand-lg">
             <div class="container">
@@ -227,7 +248,7 @@
                     <div id="price-display">1000 - 10000 руб.</div>
                 </div>                
             </div>
-            <div class="col-md-9 d-flex flex-column">
+            <div class="col-md-9 d-flex flex-column" id="rooms-list">
             </div>
         </div>
     </div>
@@ -296,7 +317,7 @@
         { number: 12, guests: 4, title: "Апартаменты", description: "Просторные апартаменты с кухней и спальней.", price: 7000, images: ["https://i.ytimg.com/vi/CBFgUzsgMZI/maxresdefault.jpg", "https://staisha.top/uploads/posts/2023-02/1675310638_staisha-top-p-mebellar-spalni-spalnya-pinterest-65.jpg", "https://via.placeholder.com/350x150"], services: ["Wi-Fi", "Кухня", "Две спальни", "Завтрак в номер"], meal: ["Завтрак включен","Обед включен","Ужин включен"], rooms: 3 }
     ];   
 
-    const roomsContainer = document.getElementById('rooms-container');
+    const roomsContainer = document.getElementById('rooms-list');
     const guestsSelect = document.getElementById('guests');
     const priceRange = document.getElementById('price-range');
     const priceDisplay = document.getElementById('price-display');
@@ -327,7 +348,7 @@
     }
 
     function renderRooms(data) {
-        roomsContainer.querySelector('.col-md-9').innerHTML = ''; 
+        roomsContainer.innerHTML = ''; 
         data.forEach(room => {
             let imageCarousel = "";
             if (room.images && room.images.length > 0) {
@@ -366,7 +387,7 @@
                     </div>
                 </div>
             `;
-            roomsContainer.querySelector('.col-md-9').insertAdjacentHTML('beforeend', card);
+            roomsContainer.insertAdjacentHTML('beforeend', card);
         });
         attachBookingListeners();
     }
@@ -394,8 +415,7 @@
         });
     }
 
-    function calculateTotalPrice(roomPrice, filters, arrivalDate, departureDate) {
-        let totalPrice = roomPrice;
+    function calculateTotalPrice(roomPrice, filters, arrivalDate, departureDate) {        let totalPrice = roomPrice;
         const oneDay = 24 * 60 * 60 * 1000; 
         const diffDays = Math.round(Math.abs((new Date(departureDate) - new Date(arrivalDate)) / oneDay));
 
@@ -565,27 +585,41 @@ arrivalInput.addEventListener('change', validateDates);
         renderRooms(filteredRooms);
     }
 
+        function showCookieConsent() {
+            const cookieConsent = document.getElementById('cookieConsent');
+            cookieConsent.style.display = 'block';
+        }
 
-</script>
+        function hideCookieConsent() {
+            const cookieConsent = document.getElementById('cookieConsent');
+            cookieConsent.style.display = 'none';
+            localStorage.setItem('cookieConsentAccepted', 'true');
+        }
 
-<footer class="d-flex justify-content-between align-items-start py-3 my-4 border-top">
-    <div class="text-start" style="font-family: 'Advent Pro'; font-weight: medium; font-size: 20px;">
-        <p class="mb-1 text-body-secondary">Часы работы:</p>
-        <p class="mb-2 text-body-secondary">Ресепшен: Круглосуточно</p>
-        <p class="mb-3 text-body-secondary">Бронирование: с 09:00 до 21:00</p>
-    </div>
+        if (localStorage.getItem('cookieConsentAccepted') !== 'true') {
+            showCookieConsent();
+        }
 
-    <div class="text-center mb-3">
-        <a href="index.html" class="link-body-emphasis text-decoration-none">
-            <img src="Evrasia.svg" alt="Eurasia" width="100" height="80" class="me-2">
-        </a>
-    </div>
+        document.getElementById('cookieAccept').addEventListener('click', hideCookieConsent);
+    </script>
 
-    <div class="text-end" style="font-family: 'Advent Pro'; font-weight: medium; font-size: 20px;">
-        <p class="mb-1 text-body-secondary">Наш адрес:</p>
-        <p class="mb-1 text-body-secondary">Россия</p>
-        <p><a href="privacy_policy.html">Политика конфиденциальности</a></p>  <!-- Добавленная ссылка -->
-    </div>
-</footer>
+    <footer class="d-flex justify-content-between align-items-start py-3 my-4 border-top">
+        <div class="text-start" style="font-family: 'Advent Pro'; font-weight: medium; font-size: 20px;">
+            <p class="mb-1 text-body-secondary">Часы работы:</p>
+            <p class="mb-2 text-body-secondary">Ресепшен: Круглосуточно</p>
+            <p class="mb-3 text-body-secondary">Бронирование: с 09:00 до 21:00</p>
+        </div>
+
+        <div class="text-center mb-3">
+            <a href="index.html" class="link-body-emphasis text-decoration-none">
+                <img src="Evrasia.svg" alt="Eurasia" width="100" height="80" class="me-2">
+            </a>
+        </div>
+
+        <div class="text-end" style="font-family: 'Advent Pro'; font-weight: medium; font-size: 20px;">
+            <p class="mb-1 text-body-secondary">Наш адрес:</p>
+            <p class="mb-1 text-body-secondary">Россия</p>
+        </div>
+    </footer>
 </body>
 </html>
